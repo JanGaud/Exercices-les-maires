@@ -32,13 +32,14 @@ export default class MaireXhr {
     }
      */
     #aMaires;
+    static nbMaire = 0; 
     /**
      * Représente le constructeur de la classe
      * Qu'est-ce qui pourrait être fait rapidement à la construction de l'objet ?
      */
     constructor(textJSON){
         let tableauParse = JSON.parse(textJSON);
-        this.#aMaires = Object.setPrototypeOf(tableauParse, MaireXhr.prototype);
+        this.#aMaires = tableauParse;
     }
     
      /**
@@ -50,7 +51,15 @@ export default class MaireXhr {
       * @returns {UnMaire[]} - Tableau des résultats;
      */
     rechercheMaires(params){
-        
+      var oReq = new XMLHttpRequest();
+      oReq.onreadystatechange = () => {
+        if(oReq.readyState == 4 && oReq.status == 200){
+          params.callback(new MaireXhr(oReq.responseText).getMaire());
+        }
+      };
+
+      oReq.open("get", `https://jmartel.webdev.cmaisonneuve.qc.ca/wsmaires/maires/recherche?type=${params.type}&valeur=${params.valeur}`, true);
+      oReq.send();
     }
     
     /**
@@ -78,7 +87,7 @@ export default class MaireXhr {
      * @returns {Number} - Le nombre d'enregistrement dans le tableau des maires
      */
     getNombreMaires(){
-        
+      return MaireXhr.nbMaire;
     }
 
     getMaire(){

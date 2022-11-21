@@ -34,12 +34,13 @@ export default class MaireFetch {
     }
      */
     #aMaires;
+    static nbMaire = 0;
     /**
      * Représente le constructeur de la classe
      * Qu'est-ce qui pourrait être fait rapidement à la construction de l'objet ?
      */
       constructor(textJSON){
-        this.#aMaires = Object.setPrototypeOf(textJSON, MaireFetch.prototype);
+        this.#aMaires = textJSON;
       }
     
      /**
@@ -51,7 +52,15 @@ export default class MaireFetch {
       * @returns {UnMaire[]} - Tableau des résultats;
      */
     rechercheMaires(params){
-        
+      fetch(`https://jmartel.webdev.cmaisonneuve.qc.ca/wsmaires/maires/recherche?type=${params.type}&valeur=${params.valeur}`)
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(response) {
+        MaireFetch.nbMaire = response.length;
+        params.callback(new MaireFetch(response).getMaire());
+        console.log(response.length);
+      });
     }
     
     /**
@@ -68,6 +77,7 @@ export default class MaireFetch {
         return response.json();
       })
       .then(function(response) {
+        MaireFetch.nbMaire = response.length;
         params.callback(new MaireFetch(response).getMaire());
       });
     }
@@ -76,7 +86,7 @@ export default class MaireFetch {
      * @returns {Number} - Le nombre d'enregistrement dans le tableau des maires
      */
     getNombreMaires(){
-        
+        return MaireFetch.nbMaire;
     }
 
     getMaire(){
